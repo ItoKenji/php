@@ -1,0 +1,49 @@
+<?php
+
+//データベース接続
+require_once("db.php");
+$pdo = db_connect();
+
+//仮登録テーブル(pre_member)作成
+$sql = "CREATE TABLE pre_member"
+."("
+."id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+."urltoken VARCHAR(128) NOT NULL,"
+."mail VARCHAR(50) NOT NULL,"
+."date DATETIME NOT NULL,"
+."flag TINYINT(1) NOT NULL DEFAULT 0"
+.");";
+
+$stmt = $pdo->query($sql);
+
+//セッションの開始
+session_start();
+header("Content-type: text/html; charset=utf-8");
+ 
+//CSRF対策
+//適当な乱数をエンコードしてセッション変数に格納する
+$_SESSION['token'] = base64_encode(mt_rand());
+$token = $_SESSION['token'];
+
+//クリックジャッキング対策
+header('X-FRAME-OPTIONS: SAMEORIGIN');
+
+?>
+ 
+<!DOCTYPE html>
+<html>
+<head>
+<title>仮登録</title>
+<meta charset="utf-8">
+</head>
+<body>
+ 
+<form action="provisional registration_mail_check.php" method="post">
+<label>メールアドレス：<input type="text" name="mail" size="50"></label>
+<input type="hidden" name="token" value="<?php echo $token; ?>">
+<input type="submit" value="送信">
+ 
+</form>
+ 
+</body>
+</html>
